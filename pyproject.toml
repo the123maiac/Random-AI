@@ -21,6 +21,7 @@ dependencies = [
     "numpy>=1.26",
     "readability-lxml>=0.8",
     "lxml[html_clean]>=5",
+    "huggingface_hub>=0.25",
 ]
 
 [project.optional-dependencies]

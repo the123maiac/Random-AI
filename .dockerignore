@@ -1,0 +1,15 @@
+.git
+.venv
+venv
+__pycache__
+*.pyc
+.pytest_cache
+data/app.db
+data/app.db-*
+data/logs
+data/user_files
+.DS_Store
+*.egg-info
+build
+dist
+docs

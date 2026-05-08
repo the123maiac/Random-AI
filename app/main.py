@@ -10,7 +10,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import auth, crypto, db, embeddings, services, usage
+from . import auth, backup, crypto, db, embeddings, services, usage
 from .agent import loop as agent_loop, research, scheduler
 from .providers import get_provider
 
@@ -20,6 +20,7 @@ PROVIDERS = ("openai_compat", "anthropic", "gemini")
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    backup.restore_on_boot()
     db.init_db()
     crypto.get_fernet()
     scheduler.start()
@@ -27,6 +28,7 @@ async def lifespan(_app: FastAPI):
         yield
     finally:
         scheduler.shutdown()
+        backup.push_backup()
 
 
 app = FastAPI(title="agentic-chat", lifespan=lifespan)
@@ -423,6 +425,16 @@ class KillIn(BaseModel):
 async def set_kill(body: KillIn, user=Depends(auth.require_user)):
     usage.set_killed(body.killed)
     return {"killed": usage.is_killed()}
+
+
+@app.post("/api/backup-now")
+async def backup_now(user=Depends(auth.require_user)):
+    return backup.push_backup()
+
+
+@app.get("/healthz")
+async def healthz():
+    return {"ok": True, "ts": datetime.now(timezone.utc).isoformat()}
 
 
 # ===== static =====

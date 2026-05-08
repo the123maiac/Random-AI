@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from .. import db, usage
+from .. import backup, db, usage
 from . import research
 
 log = logging.getLogger("scheduler")
@@ -59,6 +59,7 @@ def start() -> None:
         return
     s = AsyncIOScheduler(timezone="UTC")
     s.add_job(_tick, "interval", minutes=2, id="research_tick", replace_existing=True)
+    s.add_job(backup.push_backup, "interval", minutes=30, id="backup_push", replace_existing=True)
     s.start()
     _scheduler = s
     log.info("scheduler started")
