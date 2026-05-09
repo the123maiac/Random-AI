@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from . import crypto, db
 
-SERVICES = ("brave_search", "firecrawl", "github", "resend")
+SERVICES = ("firecrawl", "github", "resend")
 
 
 def set_service_key(user_id: int, service: str, token: str) -> None:

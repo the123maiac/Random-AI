@@ -6,9 +6,9 @@ from . import db
 
 DEFAULT_CAPS = {
     "llm_step": 200,
-    "web_search": 50,
-    "fetch": 200,
-    "firecrawl": 16,        # ~500/mo on Firecrawl free tier
+    "web_search": 12,       # Firecrawl /search ~1 credit each
+    "fetch": 200,           # plain httpx fetches, free
+    "firecrawl": 4,         # Firecrawl /scrape — reserved for JS-heavy sites
     "github": 800,          # 5000/h authenticated, well under
 }
 

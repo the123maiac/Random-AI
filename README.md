@@ -12,10 +12,10 @@ short_description: BYO-key agentic chat that researches GitHub on a schedule
 # agentic-chat
 
 BYO-key agentic chat for a small trusted group. The agent uses tool calling to
-search the web, scrape pages, search GitHub, send email, and read/write
-sandboxed files. A background scheduler runs research topics on an interval —
-each run summarizes findings into a knowledge base that future chats retrieve
-via embeddings (RAG).
+search the web (Firecrawl), scrape pages (Firecrawl + httpx fallback), search
+GitHub, send email (Resend), and read/write sandboxed files. A background
+scheduler runs research topics on an interval — each run summarizes findings
+into a knowledge base that future chats retrieve via embeddings (RAG).
 
 ## Run locally (macOS)
 

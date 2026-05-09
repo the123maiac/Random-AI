@@ -74,12 +74,14 @@ async def run_topic(topic: dict) -> dict:
     errors: list[str] = []
 
     try:
-        # 1) GitHub repo search for the topic
+        # 1) GitHub repo search (free, ~always works)
         gh = await tools.github_search(user_id, topic["query"], "repositories", count=6)
         repo_items = gh.get("items") or []
-        # 2) Web search for diverse sources
-        ws = await tools.web_search(user_id, topic["query"], count=5)
-        web_items = ws.get("results") or []
+        # 2) Web search via Firecrawl — only if GitHub was thin (saves credits)
+        web_items: list[dict] = []
+        if len(repo_items) < 3:
+            ws = await tools.web_search(user_id, topic["query"], count=5)
+            web_items = ws.get("results") or []
 
         candidates: list[tuple[str, str]] = []  # (url, title)
         for r in repo_items:

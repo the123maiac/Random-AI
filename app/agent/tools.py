@@ -41,22 +41,26 @@ async def web_search(user_id: int, query: str, count: int = 5) -> dict:
     ok, _, cap = usage.check(user_id, "web_search")
     if not ok:
         return {"error": f"web_search daily cap reached ({cap}/day) or kill switch on"}
-    key = services.get_service_key(user_id, "brave_search")
+    key = services.get_service_key(user_id, "firecrawl")
     if not key:
-        return {"error": _no_key("brave_search")}
+        return {"error": _no_key("firecrawl")}
     usage.increment(user_id, "web_search")
-    async with httpx.AsyncClient(timeout=20) as c:
-        r = await c.get(
-            "https://api.search.brave.com/res/v1/web/search",
-            params={"q": query, "count": min(count, 10)},
-            headers={"X-Subscription-Token": key, "Accept": "application/json"},
+    async with httpx.AsyncClient(timeout=30) as c:
+        r = await c.post(
+            "https://api.firecrawl.dev/v1/search",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+            json={"query": query, "limit": min(count, 10)},
         )
         if r.status_code != 200:
-            return {"error": f"brave {r.status_code}: {r.text[:200]}"}
+            return {"error": f"firecrawl search {r.status_code}: {r.text[:200]}"}
         data = r.json()
     results = []
-    for w in (data.get("web", {}).get("results") or [])[:count]:
-        results.append({"title": w.get("title"), "url": w.get("url"), "snippet": w.get("description")})
+    for w in (data.get("data") or [])[:count]:
+        results.append({
+            "title": w.get("title"),
+            "url": w.get("url"),
+            "snippet": w.get("description") or w.get("snippet"),
+        })
     return {"results": results}
 
 
